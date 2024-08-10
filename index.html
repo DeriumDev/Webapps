@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatting Website</title>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <!-- Firebase Auth -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        #chat-container {
+            width: 300px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #chat-box {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: #fafafa;
+        }
+        #message-input {
+            width: calc(100% - 60px);
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        #send-button {
+            width: 50px;
+            padding: 5px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="chat-box"></div>
+        <input type="text" id="message-input" placeholder="Type a message...">
+        <button id="send-button">Send</button>
+    </div>
+
+    <script>
+       // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDYwm1Xw3uDQjWIYbd-8_IjUBd_4bf0e54",
+  authDomain: "lifafa-fb6bd.firebaseapp.com",
+  projectId: "lifafa-fb6bd",
+  storageBucket: "lifafa-fb6bd.appspot.com",
+  messagingSenderId: "667404048293",
+  appId: "1:667404048293:web:50da855dbf088a3f26fa4c",
+  measurementId: "G-ZXE7K9SGC9"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Firebase Authentication (Anonymous Sign-In)
+        auth.signInAnonymously().catch(function(error) {
+            console.error(error.message);
+        });
+
+        // Firestore reference
+        const messagesRef = db.collection('messages');
+
+        // Send message
+        document.getElementById('send-button').addEventListener('click', () => {
+            const message = document.getElementById('message-input').value;
+            messagesRef.add({
+                text: message,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            document.getElementById('message-input').value = '';
+        });
+
+        // Listen for messages
+        messagesRef.orderBy('timestamp').onSnapshot(snapshot => {
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = '';
+            snapshot.forEach(doc => {
+                const message = doc.data().text;
+                const p = document.createElement('p');
+                p.textContent = message;
+                chatBox.appendChild(p);
+            });
+        });
+    </script>
+</body>
+</html>
